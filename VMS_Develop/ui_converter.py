@@ -41,7 +41,7 @@ class ConverterFrame(ctk.CTkFrame):
 
         # 変換形式
         ctk.CTkLabel(self.conv_settings_frame, text="変換後の形式:", font=self.sys_font).grid(row=0, column=0, padx=10, pady=10)
-        self.target_combo = ctk.CTkComboBox(self.conv_settings_frame, values=[".mp4", ".avi", ".mkv", ".mov", ".mp3", ".wav", ".aac", ".m4a", ".ogg", ".flac"], font=self.sys_font, dropdown_font=self.sys_font)
+        self.target_combo = ctk.CTkComboBox(self.conv_settings_frame, values=[".mp4", ".avi", ".mkv", ".mov", ".mp3", ".wav", ".aac", ".m4a", ".ogg", ".flac"], font=self.sys_font, dropdown_font=self.sys_font, state="readonly")
         self.target_combo.set("mp4")
         self.target_combo.grid(row=0, column=1, padx=10, pady=10)
 

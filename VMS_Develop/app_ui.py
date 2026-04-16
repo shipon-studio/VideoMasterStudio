@@ -15,6 +15,7 @@ class MainGUI(ctk.CTk):
         # --- 1. 基本設定 ---
         self.title("Video Master Studio") # ウィンドウタイトル
         self.geometry("1000x750") # 初期起動ウィンドウ
+        self.minsize(750, 560) # ウィンドウ最小サイズ
 
         # 共通フォントを定義
         self.sys_font = ("Meiryo", 13)
@@ -64,8 +65,7 @@ class MainGUI(ctk.CTk):
         self.label_nav = ctk.CTkLabel(self.navigation_frame, text="機能一覧", font=("Meiryo", 20, "bold"))
         self.label_nav.pack(pady=20, padx=10)
 
-        # YouTube DL から Video DL に名称変更
-        self.btn_yt = ctk.CTkButton(self.navigation_frame, text="Video DL", font=self.sys_font_bold,
+        self.btn_yt = ctk.CTkButton(self.navigation_frame, text="Web Media DL", font=self.sys_font_bold,
                                     fg_color="transparent", text_color=("gray10", "gray90"),
                                     hover_color=("gray70", "gray30"), anchor="w",
                                     command=self.show_video_dl_frame)

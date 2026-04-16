@@ -49,7 +49,7 @@ class VideoDLFrame(ctk.CTkFrame):
         self.thumbnail_label = ctk.CTkLabel(self.info_frame, text="[ 画像プレビュー ]", font=self.sys_font)
         self.thumbnail_label.pack(pady=5)
 
-        # 設定エリア (self に配置！)
+        # 設定エリア (self に配置)
         self.options_frame = ctk.CTkFrame(self)
         self.options_frame.pack(pady=10, padx=20, fill="x")
 
@@ -64,11 +64,14 @@ class VideoDLFrame(ctk.CTkFrame):
         self.res_label.grid(row=0, column=0, padx=5)
         self.res_combo = ctk.CTkComboBox(self.settings_subframe, values=["---"], font=self.sys_font, dropdown_font=self.sys_font)
         self.res_combo.grid(row=0, column=1, padx=5)
+        self.res_combo.set("---") # 先にセットしてからブロック
+        self.res_combo.configure(state="disabled")
 
         self.ext_label = ctk.CTkLabel(self.settings_subframe, text="形式:", font=self.sys_font)
         self.ext_label.grid(row=0, column=2, padx=5)
-        self.ext_combo = ctk.CTkComboBox(self.settings_subframe, values=[".mp4", ".mkv", ".avi", ".mov", ".webm"], font=self.sys_font, dropdown_font=self.sys_font)
+        self.ext_combo = ctk.CTkComboBox(self.settings_subframe, values=[".mp4", ".mkv", ".avi", ".mov", ".webm"], font=self.sys_font, dropdown_font=self.sys_font, state="readonly")
         self.ext_combo.grid(row=0, column=3, padx=5)
+        self.ext_combo.set(".mp4") # 初期値をセット
         self.ext_combo.configure(command=self.on_ext_change)
 
         self.path_button = ctk.CTkButton(self.options_frame, text=f"保存先: {self.config.settings['last_save_path']}", 
@@ -93,10 +96,10 @@ class VideoDLFrame(ctk.CTkFrame):
             self.ext_combo.set(".mp4")
             
             if self.current_resolutions:
-                self.res_combo.configure(state="normal", values=self.current_resolutions)
+                self.res_combo.configure(state="readonly", values=self.current_resolutions)
                 self.res_combo.set(self.current_resolutions[0])
             else:
-                self.res_combo.configure(state="normal")
+                self.res_combo.configure(state="readonly")
                 self.res_combo.configure(values=["---"])
                 self.res_combo.set("---")
                 self.res_combo.configure(state="disabled")
@@ -105,28 +108,28 @@ class VideoDLFrame(ctk.CTkFrame):
             self.ext_combo.configure(values=[".mp3", ".m4a", ".wav", ".flac", ".aac", ".ogg"])
             self.ext_combo.set(".mp3")
             
-            self.res_combo.configure(state="normal", values=["128k", "192k", "256k", "320k"])
+            self.res_combo.configure(state="readonly", values=["128k", "192k", "256k", "320k"])
             self.res_combo.set("320k")
 
     """ファイル形式が変わったとき、最適なビットレートの選択肢を提示する"""
     def on_ext_change(self, value):
         if self.mode_switch.get() == "音源で保存":
             if value == ".wav":
-                self.res_combo.configure(state="normal", values=["1411k"])
+                self.res_combo.configure(state="readonly", values=["1411k"])
                 self.res_combo.set("1411k")
                 self.res_combo.configure(state="disabled")
                 
             elif value == ".flac":
-                self.res_combo.configure(state="normal", values=["Lossless"])
+                self.res_combo.configure(state="readonly", values=["Lossless"])
                 self.res_combo.set("Lossless")
                 self.res_combo.configure(state="disabled")
                 
             elif value in [".m4a", ".aac"]:
-                self.res_combo.configure(state="normal", values=["128k", "192k", "256k", "320k"])
+                self.res_combo.configure(state="readonly", values=["128k", "192k", "256k", "320k"])
                 self.res_combo.set("256k")
                 
             else:
-                self.res_combo.configure(state="normal", values=["128k", "192k", "256k", "320k"])
+                self.res_combo.configure(state="readonly", values=["128k", "192k", "256k", "320k"])
                 if self.res_combo.get() not in ["128k", "192k", "256k", "320k"]:
                     self.res_combo.set("192k")
 
@@ -156,7 +159,7 @@ class VideoDLFrame(ctk.CTkFrame):
             self.current_resolutions = info["resolutions"]
 
             if self.mode_switch.get() == "動画で保存":
-                self.res_combo.configure(values=info["resolutions"], state="normal")
+                self.res_combo.configure(values=info["resolutions"], state="readonly")
                 if info["resolutions"]:
                     self.res_combo.set(info["resolutions"][0])
 
