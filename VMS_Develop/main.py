@@ -18,7 +18,7 @@ def startup_check(engine):
     root.withdraw() # ウィンドウ自体は見せない
     
     if "is up to date" in update_msg:
-        print("yt-dlp は最新の状態ですよ。")
+        print("yt-dlp は最新の状態です。")
     else:
         # 更新が完了、またはエラーが起きた場合に通知
         messagebox.showinfo("システム更新", f"エンジンの更新状況:\n{update_msg}")
