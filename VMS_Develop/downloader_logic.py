@@ -13,12 +13,12 @@ class YTDLPEngine:
 
     """yt-dlpのアップデートを実行"""
     def check_update(self):
-        # 1. そもそもファイルがあるかチェック
+        # 1. ファイルがあるかチェック（デッドロック回避用）
         if not os.path.exists(self.ytdlp_exe):
             return "エラー: yt-dlp.exe と ffmpeg.exe をアプリと同じフォルダに入れてください。"
 
         try:
-            # 2. 黒いコマンドプロンプト画面がポップアップするのを防ぐ設定
+            # 2. コマンドプロンプト画面のポップアップ防止
             creationflags = 0
             if os.name == 'nt':
                 creationflags = subprocess.CREATE_NO_WINDOW
@@ -94,12 +94,23 @@ class YTDLPEngine:
         if opts['mode'] == 'video':
             res = opts['resolution'].replace("p", "")
             
-            if opts['ext'] == 'mp4':
-                fmt = f"bestvideo[height<={res}]+bestaudio[ext=m4a]/bestvideo[height<={res}]+bestaudio/best"
-            elif opts['ext'] == 'webm':
-                fmt = f"bestvideo[height<={res}]+bestaudio[ext=webm]/bestvideo[height<={res}]+bestaudio/best"
-            else:
-                fmt = f"bestvideo[height<={res}]+bestaudio/best"
+            # 画質にbestが送られた場合の処理
+            if res == "best":
+                if opts['ext'] == 'mp4':
+                    fmt = "bestvideo+bestaudio[ext=m4a]/best"
+                elif opts['ext'] == 'webm':
+                    fmt = "bestvideo+bestaudio[ext=webm]/best"
+                else:
+                    fmt = "bestvideo+bestaudio/best" 
+
+            # best以外のサイズが送られた場合の処理
+            else:              
+                if opts['ext'] == 'mp4':
+                    fmt = f"bestvideo[height<={res}]+bestaudio[ext=m4a]/bestvideo[height<={res}]+bestaudio/best"
+                elif opts['ext'] == 'webm':
+                    fmt = f"bestvideo[height<={res}]+bestaudio[ext=webm]/bestvideo[height<={res}]+bestaudio/best"
+                else:
+                    fmt = f"bestvideo[height<={res}]+bestaudio/best"
             
             target_ext = opts['ext'].lower()
             
