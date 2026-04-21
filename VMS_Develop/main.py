@@ -6,7 +6,7 @@ from downloader_logic import YTDLPEngine
 from app_ui import MainGUI
 
 def startup_check(engine):
-    """設計図 ⑥: 起動時のアップデートチェック"""
+    """起動時のアップデートチェック"""
     print("エンジンの更新を確認しています...")
     
     # 実際にはここでバージョン比較を行いますが、
@@ -15,12 +15,12 @@ def startup_check(engine):
     
     # 標準的なメッセージボックスを出すために一時的に小さな隠しウィンドウを作成
     root = tk.Tk()
-    root.withdraw() # ウィンドウ自体は見せない
+    root.withdraw() # ウィンドウ自体は非表示
     
     if "is up to date" in update_msg:
         print("yt-dlp は最新の状態です。")
     else:
-        # 更新が完了、またはエラーが起きた場合に通知
+        # 更新が完了またはエラーが起きた場合に通知
         messagebox.showinfo("システム更新", f"エンジンの更新状況:\n{update_msg}")
     
     root.destroy()
@@ -32,8 +32,7 @@ def main():
     # 2. ダウンロードエンジンの初期化
     engine = YTDLPEngine(config)
 
-    # 3. 起動時のチェック (設計図 ⑥)
-    # 毎回だと起動が遅くなるため、必要に応じてここに確認ダイアログを入れるのもアリです
+    # 3. 起動時のチェック
     startup_check(engine)
 
     # 4. メインGUIの起動

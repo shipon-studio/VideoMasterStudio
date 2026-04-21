@@ -162,6 +162,12 @@ class VideoDLFrame(ctk.CTkFrame):
                 self.res_combo.configure(values=info["resolutions"], state="readonly")
                 if info["resolutions"]:
                     self.res_combo.set(info["resolutions"][0])
+                else:
+                    # リストが空っぽだった場合の回避策
+                    self.res_combo.configure(state="normal")
+                    self.res_combo.configure(values=["自動 (最高画質)"])
+                    self.res_combo.set("自動 (最高画質)")
+                    self.res_combo.configure(state="readonly")
 
             if info.get("thumbnail"):
                 try:
@@ -186,6 +192,13 @@ class VideoDLFrame(ctk.CTkFrame):
         mode = "video" if self.mode_switch.get() == "動画で保存" else "audio"
         res = self.res_combo.get()
         ext = self.ext_combo.get().replace(".", "")
+
+        # 自動を選んでいる場合はyt-dlp用に変換
+        if res == "自動（最高画質）" or res == "---":
+            actual_res = "best"
+        else:
+            actual_res = res
+
         save_path = self.config.settings['last_save_path']
         
         safe_title = re.sub(r'[\\/*?:"<>|]', "_", self.current_title)
@@ -206,8 +219,11 @@ class VideoDLFrame(ctk.CTkFrame):
         temp_title = f"temp_{temp_id}_{final_title}"
 
         opts = {
-            "mode": mode, "resolution": res, "ext": ext,
-            "bitrate": res.replace("k", ""), "save_path": save_path,
+            "mode": mode,
+            "resolution": actual_res,
+            "ext": ext,
+            "bitrate": res.replace("k", ""),
+            "save_path": save_path,
             "custom_title": temp_title,
             "final_path": expected_path
         }
