@@ -148,6 +148,9 @@ class YTDLPEngine:
 
         # stdoutを一行ずつ読み取って進捗率を探す
         for line in process.stdout:
+
+            print(line.strip()) # デバッグ用
+
             # 正規表現で "[download]  12.3% of ..." のような形式から数値を抜く
             match = re.search(r'(\d+(\.\d+)?)%', line)
             if match:

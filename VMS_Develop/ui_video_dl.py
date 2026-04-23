@@ -194,7 +194,7 @@ class VideoDLFrame(ctk.CTkFrame):
         ext = self.ext_combo.get().replace(".", "")
 
         # 自動を選んでいる場合はyt-dlp用に変換
-        if res == "自動（最高画質）" or res == "---":
+        if "自動" in res or res == "---":
             actual_res = "best"
         else:
             actual_res = res
