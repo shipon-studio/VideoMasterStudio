@@ -33,13 +33,22 @@ class VideoDLFrame(ctk.CTkFrame):
         self.url_entry = ctk.CTkEntry(self.url_frame, placeholder_text="動画のURLを入力してください...", font=self.sys_font, height=40)
         self.url_entry.pack(side="left", padx=10, pady=10, expand=True, fill="x")
 
-        self.paste_button = ctk.CTkButton(self.url_frame, text="貼り付け", font=self.sys_font_bold, command=self.paste_from_clipboard, width=60, height=40, fg_color="#555555")
+        self.paste_button = ctk.CTkButton(self.url_frame, 
+                                          text="貼り付け", 
+                                          font=self.sys_font_bold, 
+                                          command=self.paste_from_clipboard, 
+                                          width=60, height=40, 
+                                          fg_color="#555555")
         self.paste_button.pack(side="left", padx=5)
 
-        self.analyze_button = ctk.CTkButton(self.url_frame, text="解析", font=self.sys_font_bold, command=self.start_analysis, width=100, height=40)
+        self.analyze_button = ctk.CTkButton(self.url_frame, 
+                                            text="解析", 
+                                            font=self.sys_font_bold, 
+                                            command=self.start_analysis, 
+                                            width=100, height=40)
         self.analyze_button.pack(side="right", padx=10)
 
-        # 動画情報表示エリア (self に配置！)
+        # 動画情報表示エリア (self に配置)
         self.info_frame = ctk.CTkFrame(self)
         self.info_frame.pack(pady=10, padx=20, fill="both", expand=True)
         
@@ -51,15 +60,21 @@ class VideoDLFrame(ctk.CTkFrame):
 
         # 設定エリア (self に配置)
         self.options_frame = ctk.CTkFrame(self)
-        self.options_frame.pack(pady=10, padx=20, fill="x")
+        self.options_frame.pack(pady=5, padx=20, fill="x")
 
-        self.mode_switch = ctk.CTkSegmentedButton(self.options_frame, values=["動画で保存", "音源で保存"], command=self.toggle_mode, font=self.sys_font)
+        # セグメントボタン
+        self.mode_switch = ctk.CTkSegmentedButton(self.options_frame, 
+                                                  values=["動画で保存", "音源で保存"], 
+                                                  command=self.toggle_mode, 
+                                                  font=self.sys_font)
         self.mode_switch.set("動画で保存")
-        self.mode_switch.pack(pady=10)
+        self.mode_switch.pack(pady=(10, 5))
 
+        # self設定の派生形
         self.settings_subframe = ctk.CTkFrame(self.options_frame, fg_color="transparent")
-        self.settings_subframe.pack(pady=10)
+        self.settings_subframe.pack(pady=5)
 
+        # 画質に関するプルタブ
         self.res_label = ctk.CTkLabel(self.settings_subframe, text="画質:", font=self.sys_font)
         self.res_label.grid(row=0, column=0, padx=5)
         self.res_combo = ctk.CTkComboBox(self.settings_subframe, values=["---"], font=self.sys_font, dropdown_font=self.sys_font)
@@ -67,12 +82,79 @@ class VideoDLFrame(ctk.CTkFrame):
         self.res_combo.set("---") # 先にセットしてからブロック
         self.res_combo.configure(state="disabled")
 
+        # 拡張子（フォーマット）に関するプルタブ
         self.ext_label = ctk.CTkLabel(self.settings_subframe, text="形式:", font=self.sys_font)
         self.ext_label.grid(row=0, column=2, padx=5)
-        self.ext_combo = ctk.CTkComboBox(self.settings_subframe, values=[".mp4", ".mkv", ".avi", ".mov", ".webm"], font=self.sys_font, dropdown_font=self.sys_font, state="readonly")
+        self.ext_combo = ctk.CTkComboBox(self.settings_subframe, 
+                                         values=[".mp4", ".mkv", ".avi", ".mov", ".webm"], 
+                                         font=self.sys_font, 
+                                         dropdown_font=self.sys_font, 
+                                         state="readonly")
         self.ext_combo.grid(row=0, column=3, padx=5)
         self.ext_combo.set(".mp4") # 初期値をセット
         self.ext_combo.configure(command=self.on_ext_change)
+
+        # 範囲設定のボタン
+        self.range_switch = ctk.CTkSwitch(self.options_frame, text="範囲指定：無効", state="disabled", font=self.sys_font)
+        self.range_switch.pack(pady=5)
+        self.range_switch.configure(command=self.range_check)
+
+        # スライダー用の配置
+        self.up_slider_frame = ctk.CTkFrame(self.options_frame, fg_color="transparent")
+        self.up_slider_frame.pack(padx=20, pady=5, fill="x")
+        self.dw_slider_frame = ctk.CTkFrame(self.options_frame, fg_color="transparent")
+        self.dw_slider_frame.pack(padx=20, pady=5, fill="x")
+
+        # スライダーと範囲の入力ボックス
+        # 開始地点のスライダーと入力ボックス
+        self.range_s_label = ctk.CTkLabel(self.up_slider_frame, 
+                                          text="開始地点", 
+                                          font=self.sys_font, 
+                                          text_color="gray")
+        self.range_s_label.pack(side="left", padx=(0, 10))
+        self.range_s_slider = ctk.CTkSlider(self.up_slider_frame,
+                                            from_=0, to=1, 
+                                            state="disabled", 
+                                            button_color="gray", 
+                                            progress_color="gray")
+        self.range_s_slider.pack(side="left", fill="x", expand=True, padx=(0, 10))
+        self.range_s_slider.set(0)
+        self.range_s_combo = ctk.CTkEntry(self.up_slider_frame, 
+                                          placeholder_text="00:00:00", 
+                                          width=80, 
+                                          justify="center",
+                                          state="disabled",
+                                          text_color="gray")
+        self.range_s_combo.pack(side="right")
+        
+        # 終了地点のスライダーと入力ボックス
+        self.range_f_label = ctk.CTkLabel(self.dw_slider_frame, 
+                                          text="終了地点", 
+                                          font=self.sys_font, 
+                                          text_color="gray")
+        self.range_f_label.pack(side="left", padx=(0, 10))
+        self.range_f_slider = ctk.CTkSlider(self.dw_slider_frame, 
+                                            from_=0, to=1, 
+                                            state="disabled", 
+                                            button_color="gray", 
+                                            progress_color="gray")
+        self.range_f_slider.pack(side="left", fill="x", expand=True, padx=(0, 10))
+        self.range_f_slider.set(0)
+        self.range_f_combo = ctk.CTkEntry(self.dw_slider_frame, 
+                                          placeholder_text="00:00:00", 
+                                          width=80, 
+                                          justify="center", 
+                                          state="disabled",
+                                          text_color="gray")
+        self.range_f_combo.pack(side="right")
+
+        # スライダー作成時に command を指定
+        self.range_s_slider.configure(command=self.on_s_slider_move)
+        self.range_f_slider.configure(command=self.on_f_slider_move)
+
+        # 入力欄作成時に Enterキーイベントをバインド
+        self.range_s_combo.bind("<Return>", self.on_s_entry_return)
+        self.range_f_combo.bind("<Return>", self.on_f_entry_return)
 
         self.path_button = ctk.CTkButton(self.options_frame, text=f"保存先: {self.config.settings['last_save_path']}", 
                                          fg_color="gray", command=self.select_path, font=self.sys_font)
@@ -82,8 +164,13 @@ class VideoDLFrame(ctk.CTkFrame):
         self.progress_bar.set(0)
         self.progress_bar.pack(pady=10, padx=20, fill="x")
 
-        self.dl_button = ctk.CTkButton(self, text="ダウンロード開始", state="disabled", height=50, command=self.start_download, font=self.sys_font_bold)
-        self.dl_button.pack(pady=20)
+        self.dl_button = ctk.CTkButton(self, 
+                                       text="ダウンロード開始", 
+                                       state="disabled", 
+                                       height=50, 
+                                       command=self.start_download, 
+                                       font=self.sys_font_bold)
+        self.dl_button.pack(pady=10)
 
     # ============================
     # Web Media DL 制御ロジック
@@ -133,6 +220,148 @@ class VideoDLFrame(ctk.CTkFrame):
                 if self.res_combo.get() not in ["128k", "192k", "256k", "320k"]:
                     self.res_combo.set("192k")
 
+    """範囲指定が無効/有効状態を確認する"""
+    def range_check(self):
+        new_state = "normal" if self.range_switch.get() else "disabled"
+        
+        # 状態に応じた色を定義（タプルでライトモード/ダークモード両対応）
+        if new_state == "normal":
+            self.range_switch.configure(text="範囲設定：有効")
+            label_color = ("black", "white")              # デフォルトの文字色
+            slider_btn_color = ("#3B8ED0", "#1F6AA5") # デフォルトのスライダーツマミの青
+            slider_prg_color = ("#3A7EBF", "#1F538D") # デフォルトのゲージの青
+        else:
+            self.range_switch.configure(text="範囲設定：無効")
+            label_color = "gray"
+            slider_btn_color = "gray"
+            slider_prg_color = "gray"
+
+        # 1. ラベルの色を更新
+        self.range_s_label.configure(text_color=label_color)
+        self.range_f_label.configure(text_color=label_color)
+
+        # 2. スライダーの状態と色を更新
+        self.range_s_slider.configure(state=new_state, button_color=slider_btn_color, progress_color=slider_prg_color)
+        self.range_f_slider.configure(state=new_state, button_color=slider_btn_color, progress_color=slider_prg_color)
+
+        # 3. ボックスの状態と色を更新
+        self.range_s_combo.configure(state=new_state, text_color=label_color)
+        self.range_f_combo.configure(state=new_state, text_color=label_color)
+
+    """範囲指定スライダーの設定"""
+    # 開始スライダーを動かした時の処理
+    def on_s_slider_move(self, value):
+        # 秒数を 00:00:00 形式に変換して入力欄に表示
+        self.range_s_combo.configure(state="normal")
+        self.range_s_combo.delete(0, "end")
+        self.range_s_combo.insert(0, self.format_time(value))
+
+    # 終了スライダーを動かしたときの処理
+    def on_f_slider_move(self, value):
+        self.range_f_combo.configure(state="normal")
+        self.range_f_combo.delete(0, "end")
+        self.range_f_combo.insert(0, self.format_time(value))
+
+    # 入力欄でエンターキーを押した時の処理
+    # 開始時間の入力
+    def on_s_entry_return(self, event):
+        # 入力された文字列を秒数に変換してスライダーを移動
+        seconds = self.parse_time(self.range_s_combo.get())
+        self.range_s_slider.set(seconds)
+
+    # 終了時間の入力
+    def on_f_entry_return(self, event):
+        seconds = self.parse_time(self.range_f_combo.get())
+        self.range_f_slider.set(seconds)
+
+    """範囲指定スライダーの限界設定"""
+    def on_s_slider_move(self, value):
+        start_sec = int(value)
+        end_sec = int(self.range_f_slider.get())
+        
+        # 開始が終了を越えようとしたら終了の場所でブロックする
+        if start_sec > end_sec:
+            start_sec = end_sec
+            self.range_s_slider.set(start_sec) # スライダーのツマミを強制的に押し戻す
+            
+        # 自身の入力欄を更新
+        self.range_s_combo.configure(state="normal")
+        self.range_s_combo.delete(0, "end")
+        self.range_s_combo.insert(0, self.format_time(start_sec))
+
+    def on_f_slider_move(self, value):
+        end_sec = int(value)
+        start_sec = int(self.range_s_slider.get())
+        
+        # 終了が開始を越えようとしたら開始の場所でブロックする
+        if end_sec < start_sec:
+            end_sec = start_sec
+            self.range_f_slider.set(end_sec) # スライダーのツマミを強制的に押し戻す
+            
+        # 自身の入力欄を更新
+        self.range_f_combo.configure(state="normal")
+        self.range_f_combo.delete(0, "end")
+        self.range_f_combo.insert(0, self.format_time(end_sec))
+
+    """範囲指定ボックスの限界設定"""
+    def on_s_entry_return(self, event):
+        start_sec = self.parse_time(self.range_s_combo.get())
+        end_sec = int(self.range_f_slider.get())
+        
+        # 終了地点より後の時間を入力されたら終了地点の時間に合わせる
+        if start_sec > end_sec:
+            start_sec = end_sec
+
+        # スライダーの位置を更新し、入力欄を上書き
+        self.range_s_slider.set(start_sec)
+        self.range_s_combo.configure(state="normal")
+        self.range_s_combo.delete(0, "end")
+        self.range_s_combo.insert(0, self.format_time(start_sec))
+
+    def on_f_entry_return(self, event):
+        end_sec = self.parse_time(self.range_f_combo.get())
+        start_sec = int(self.range_s_slider.get())
+        max_duration = getattr(self, 'current_duration', 1)
+
+        # 動画の長さを超えたら動画の最後に合わせる
+        if end_sec > max_duration:
+            end_sec = max_duration
+            
+        # 開始地点より前の時間を入力されたら開始地点の時間に合わせる
+        if end_sec < start_sec:
+            end_sec = start_sec
+
+        # スライダーの位置を更新し、入力欄を上書き
+        self.range_f_slider.set(end_sec)
+        self.range_f_combo.configure(state="normal")
+        self.range_f_combo.delete(0, "end")
+        self.range_f_combo.insert(0, self.format_time(end_sec))
+
+    """秒数を時間文字列に変換する"""
+    def format_time(self, seconds):
+        seconds = int(seconds) # 整数で計算
+        h = seconds // 3600
+        m = (seconds % 3600) // 60
+        s = seconds % 60
+        
+        if h > 0:
+            return f"{h:02d}:{m:02d}:{s:02d}" # 1時間以上なら 01:23:45
+        else:
+            return f"{m:02d}:{s:02d}" # 1時間未満なら 12:34
+            
+    """時間文字列を秒数に変換する"""
+    def parse_time(self, time_str):
+        try:
+            parts = time_str.split(":")
+            if len(parts) == 3: # HH:MM:SS
+                return int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
+            elif len(parts) == 2: # MM:SS
+                return int(parts[0]) * 60 + int(parts[1])
+            else:
+                return int(parts[0]) # SS
+        except Exception:
+            return 0 # エラー時は0秒に設定
+
     """保存フォルダを選択して記憶する"""
     def select_path(self):
         path = filedialog.askdirectory(initialdir=self.config.settings['last_save_path'])
@@ -157,6 +386,32 @@ class VideoDLFrame(ctk.CTkFrame):
             self.title_label.configure(text=info["title"])
             self.current_title = info["title"]
             self.current_resolutions = info["resolutions"]
+
+            duration = info.get("duration", 0)
+            self.current_duration = duration # 手入力の制限用に保存
+            
+            if duration > 0:
+                # スライダーの最大値を動画の長さに更新
+                self.range_s_slider.configure(to=duration, number_of_steps=duration)
+                self.range_f_slider.configure(to=duration, number_of_steps=duration)
+                
+                # 初期位置をセット（開始は0、終了は動画の最後）
+                self.range_s_slider.set(0)
+                self.range_f_slider.set(duration)
+                
+                # テキストボックスの表記を更新（一時的にnormalにして書き換え、すぐdisabledに戻す）
+                self.range_s_combo.configure(state="normal")
+                self.range_s_combo.delete(0, "end")
+                self.range_s_combo.insert(0, self.format_time(0))
+                self.range_s_combo.configure(state="disabled")
+
+                self.range_f_combo.configure(state="normal")
+                self.range_f_combo.delete(0, "end")
+                self.range_f_combo.insert(0, self.format_time(duration))
+                self.range_f_combo.configure(state="disabled")
+
+            # 解析が終わり次第、範囲指定スイッチの封印を解く
+            self.range_switch.configure(state="normal")
 
             if self.mode_switch.get() == "動画で保存":
                 self.res_combo.configure(values=info["resolutions"], state="readonly")
@@ -218,6 +473,13 @@ class VideoDLFrame(ctk.CTkFrame):
         temp_id = str(uuid.uuid4())[:8] 
         temp_title = f"temp_{temp_id}_{final_title}"
 
+        start_sec = None
+        end_sec = None
+
+        if self.range_switch.get():
+            start_sec = int(self.range_s_slider.get())
+            end_sec = int(self.range_f_slider.get())
+
         opts = {
             "mode": mode,
             "resolution": actual_res,
@@ -225,7 +487,9 @@ class VideoDLFrame(ctk.CTkFrame):
             "bitrate": res.replace("k", ""),
             "save_path": save_path,
             "custom_title": temp_title,
-            "final_path": expected_path
+            "final_path": expected_path,
+            "start_time": start_sec,
+            "end_time": end_sec
         }
 
         self.dl_button.configure(state="disabled", text="ダウンロード中...")
