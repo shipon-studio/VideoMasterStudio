@@ -68,7 +68,8 @@ class YTDLPEngine:
                 "title": info.get('title'),
                 "thumbnail": info.get('thumbnail'),
                 "resolutions": [f"{r}p" for r in sorted_res], # [2160p, 1080p, ...]
-                "ext": info.get('ext')
+                "ext": info.get('ext'),
+                "duration": info.get('duration', 0)
             }
         except Exception as e:
             return {"error": str(e)}
@@ -89,6 +90,16 @@ class YTDLPEngine:
 
         # FFmpegの場所を教える
         cmd += ["--ffmpeg-location", self.ffmpeg_exe]
+
+        # 範囲の指定
+        start_sec = opts.get('start_time')
+        end_sec = opts.get('end_time')
+        
+        # start_secとend_secに数字が入っている場合
+        if start_sec is not None and end_sec is not None:
+            # yt-dlp に範囲指定を伝えるオプション
+            # 書式: --download-sections "*開始秒-終了秒"
+            cmd += ["--download-sections", f"*{start_sec}-{end_sec}"]
 
         # モード別の設定
         if opts['mode'] == 'video':
@@ -149,7 +160,7 @@ class YTDLPEngine:
         # stdoutを一行ずつ読み取って進捗率を探す
         for line in process.stdout:
 
-            print(line.strip()) # デバッグ用
+            # print(line.strip()) # デバッグ用
 
             # 正規表現で "[download]  12.3% of ..." のような形式から数値を抜く
             match = re.search(r'(\d+(\.\d+)?)%', line)
