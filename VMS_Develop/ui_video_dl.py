@@ -410,6 +410,13 @@ class VideoDLFrame(ctk.CTkFrame):
                 self.range_f_combo.insert(0, self.format_time(duration))
                 self.range_f_combo.configure(state="disabled")
 
+            else:
+                self.range_s_slider.configure(to=1)
+                self.range_f_slider.configure(to=1)
+                
+                # 取得不可であることを表示
+                self.range_switch.configure(state="disabled", text="範囲指定：取得不可 (非対応サイト)")
+
             # 解析が終わり次第、範囲指定スイッチの封印を解く
             self.range_switch.configure(state="normal")
 
