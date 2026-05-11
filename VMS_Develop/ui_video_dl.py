@@ -409,6 +409,9 @@ class VideoDLFrame(ctk.CTkFrame):
                 self.range_f_combo.delete(0, "end")
                 self.range_f_combo.insert(0, self.format_time(duration))
                 self.range_f_combo.configure(state="disabled")
+                
+                # 解析が終わり次第、範囲指定スイッチの封印を解く
+                self.range_switch.configure(state="normal")
 
             else:
                 self.range_s_slider.configure(to=1)
@@ -416,9 +419,6 @@ class VideoDLFrame(ctk.CTkFrame):
                 
                 # 取得不可であることを表示
                 self.range_switch.configure(state="disabled", text="範囲指定：取得不可 (非対応サイト)")
-
-            # 解析が終わり次第、範囲指定スイッチの封印を解く
-            self.range_switch.configure(state="normal")
 
             if self.mode_switch.get() == "動画で保存":
                 self.res_combo.configure(values=info["resolutions"], state="readonly")
