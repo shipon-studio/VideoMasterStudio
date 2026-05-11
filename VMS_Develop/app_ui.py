@@ -77,6 +77,12 @@ class MainGUI(ctk.CTk):
                                       command=self.show_convert_frame)
         self.btn_conv.pack(pady=5, padx=10, fill="x")
 
+        self.btn_trim = ctk.CTkButton(self.navigation_frame, text="メディアトリミング", font=self.sys_font_bold,
+                                    fg_color="transparent", text_color=("gray10", "gray90"),
+                                    hover_color=("gray70", "gray30"), anchor="w",
+                                    command=self.show_video_dl_frame)
+        self.btn_trim.pack(pady=5, padx=10, fill="x")
+
         self.spacer = ctk.CTkLabel(self.navigation_frame, text="")
         self.spacer.pack(expand=True, fill="both")
 
